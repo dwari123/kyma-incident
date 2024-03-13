@@ -1,0 +1,85 @@
+global:
+  domain: null
+  imagePullSecret:
+    {}
+srv:
+  bindings:
+    db:
+      serviceInstanceName: hana
+    auth:
+      serviceInstanceName: xsuaa
+    destination:
+      serviceInstanceName: 'destination'
+  image:
+    repository: <your-container-registry>/incident-management-srv
+    tag: latest
+  resources:
+    limits:
+      ephemeral-storage: 1G
+      memory: 500M
+    requests:
+      ephemeral-storage: 1G
+      cpu: 500m
+      memory: 500M
+  health:
+    liveness:
+      path: /
+    readiness:
+      path: /
+hana-deployer:
+  image:
+    repository: <your-container-registry>/incident-management-hana-deployer
+    tag: latest
+  bindings:
+    hana:
+      serviceInstanceName: hana
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 1G
+    requests:
+      cpu: 1000m
+      memory: 1G
+hana:
+  serviceOfferingName: hana
+  servicePlanName: hdi-shared
+xsuaa:
+  serviceOfferingName: xsuaa
+  servicePlanName: application
+  parameters:
+    xsappname: incident-management
+    tenant-mode: dedicated
+destination:
+  serviceOfferingName: 'destination'
+  servicePlanName: 'lite'
+  parameters:
+    version: '1.0.0'
+    HTML5Runtime_enabled: true
+html5-apps-repo-host:
+  serviceOfferingName: html5-apps-repo
+  servicePlanName: app-host
+html5-apps-deployer:
+  env:
+    SAP_CLOUD_SERVICE: null
+  image:
+    repository: "<your-container-registry>/incident-management-html5-deployer"
+    tag: latest
+  bindings:
+    xsuaa:
+      serviceInstanceName: xsuaa
+    destination:
+      serviceInstanceName: destination
+    html5-apps-repo:
+      serviceInstanceName: html5-apps-repo-host
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 1G
+    requests:
+      cpu: 1000m
+      memory: 1G
+  envFrom:
+    - configMapRef:
+        name: "{{ .Release.Name }}-html5-apps-deployer-configmap"
+backendDestinations:
+  {}

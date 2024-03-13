@@ -1,0 +1,40 @@
+global:
+  domain: null
+  imagePullSecret:
+    {}
+srv:
+  bindings:
+    destination:
+      serviceInstanceName: 'destination'
+  image:
+    repository: dwari123/incidents-srv
+     tag: <incident-management-srv-0.0.0>
+  resources:
+    limits:
+      ephemeral-storage: 1G
+      memory: 500M
+    requests:
+      ephemeral-storage: 1G
+      cpu: 500m
+      memory: 500M
+  health:
+    liveness:
+      path: /
+    readiness:
+      path: /
+destination:
+  serviceOfferingName: 'destination'
+  servicePlanName: 'lite'
+  parameters:
+    version: '1.0.0'
+hana-deployer:
+  image:
+    repository: dwari123
+    tag: <incident-management-hana-deployer-0.0.0>
+    html5-apps-deployer:
+  image:
+    repository: dwari123
+    tag: <incident-management-html5-deployer-0.0.0>
+    html5-apps-deployer:
+  env:
+    SAP_CLOUD_SERVICE: incidents
